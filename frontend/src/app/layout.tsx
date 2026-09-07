@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 }
 
 import { Toaster } from 'react-hot-toast'
-import { Rocket, Github } from 'lucide-react'
+import { Rocket, GitBranch } from 'lucide-react'
 
 export default function RootLayout({
   children,
@@ -30,7 +30,7 @@ export default function RootLayout({
               <div className="flex items-center gap-6">
                 <a href="/dashboard" className="text-sm text-gray-300 hover:text-white transition-colors">Dashboard</a>
                 <a href={process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/api/auth/github` : "http://localhost:4000/api/auth/github"} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full font-medium transition-all text-sm border border-white/10">
-                  <Github size={16} />
+                  <GitBranch size={16} />
                   Login
                 </a>
               </div>

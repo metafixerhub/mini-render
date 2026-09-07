@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react'
 
-import { Plus, Server, Github, ExternalLink, Activity } from 'lucide-react'
+import { Plus, Server, GitBranch, ExternalLink, Activity } from 'lucide-react'
 
 export default function DashboardPage() {
   const [projects, setProjects] = useState<any[]>([])
@@ -77,7 +77,7 @@ export default function DashboardPage() {
                     {isFailed && <span className="flex items-center gap-1.5 bg-red-500/10 text-red-400 text-xs px-2.5 py-1 rounded-full border border-red-500/20 font-medium tracking-wide">FAILED</span>}
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 font-mono bg-white/5 px-3 py-1.5 rounded-md w-fit">
-                    <Github size={14} />
+                    <GitBranch size={14} />
                     {project.repoUrl.replace('https://github.com/', '')}
                   </div>
                   <div className="flex items-center text-sm text-gray-500 gap-4">

@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Github, Code, Settings, Loader2, ArrowRight } from 'lucide-react'
+import { GitBranch, Code, Settings, Loader2, ArrowRight } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function NewDeploymentPage() {
@@ -69,7 +69,7 @@ export default function NewDeploymentPage() {
               </div>
             ) : repos.length === 0 ? (
               <div className="text-center py-10 bg-white/5 rounded-xl border border-dashed border-white/10">
-                <Github size={32} className="mx-auto text-gray-500 mb-3" />
+                <GitBranch size={32} className="mx-auto text-gray-500 mb-3" />
                 <p className="text-gray-400">No repositories found.</p>
               </div>
             ) : (
@@ -80,7 +80,7 @@ export default function NewDeploymentPage() {
                     onClick={() => setSelectedRepo(repo.url)}
                     className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${selectedRepo === repo.url ? 'border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/20 ring-offset-2 ring-offset-[#0a0a0a]' : 'border-white/10 bg-black hover:border-white/20 hover:bg-white/5'}`}
                   >
-                    <Github size={20} className={selectedRepo === repo.url ? 'text-blue-400' : 'text-gray-400'} />
+                    <GitBranch size={20} className={selectedRepo === repo.url ? 'text-blue-400' : 'text-gray-400'} />
                     <div className="overflow-hidden">
                       <span className="font-semibold text-white block truncate">{repo.name}</span>
                       <div className="text-xs text-gray-500 mt-1 truncate">{repo.url.replace('https://github.com/', '')}</div>

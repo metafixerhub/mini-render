@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react'
-import { Plus, ExternalLink, Activity, Github, Settings, RefreshCw, Key, Shield, Clock, Terminal } from 'lucide-react'
+import { Plus, ExternalLink, Activity, GitBranch, Settings, RefreshCw, Key, Shield, Clock, Terminal } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function ProjectPage({ params }: { params: { id: string } }) {
@@ -111,7 +111,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
           </div>
           <div className="flex items-center gap-4 text-sm text-gray-400">
             <a href={project.repoUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors">
-              <Github size={16} />
+              <GitBranch size={16} />
               {project.repoUrl.replace('https://github.com/', '')}
             </a>
             {isLive && latestDep?.port && (

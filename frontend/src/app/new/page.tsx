@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react'
-import { GitBranch, Rocket, Server, Github, CheckCircle2, Search, ArrowRight } from 'lucide-react'
+import { GitBranch, Rocket, Server, CheckCircle2, Search, ArrowRight, Code } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function NewProjectPage() {
@@ -62,7 +62,7 @@ export default function NewProjectPage() {
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-8">
         <div className="p-6 border-b border-gray-200 bg-gray-50">
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
-            <Github size={20} /> Connect a repository
+            <Code size={20} /> Connect a repository
           </h2>
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />

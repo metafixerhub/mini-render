@@ -4,7 +4,7 @@ require('dotenv').config();
 
 router.get('/github', (req, res) => {
   const clientId = process.env.GITHUB_CLIENT_ID;
-  const backendUrl = process.env.BACKEND_URL || 'http://localhost:4000';
+  const backendUrl = process.env.BACKEND_URL || 'https://backend-mini-render.vercel.app';
   const redirectUri = `${backendUrl}/api/auth/github/callback`;
   
   if (clientId) {

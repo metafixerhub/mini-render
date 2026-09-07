@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id        Int      @id @default(autoincrement())
+  name      String
+  repoUrl   String
+  createdAt DateTime @default(now())
+  deployments Deployment[]
+  envVars   EnvVar[]
+}
+
+model EnvVar {
+  id        Int      @id @default(autoincrement())
+  key       String
+  value     String
+  projectId Int
+  project   Project  @relation(fields: [projectId], references: [id])
+}
+
+model Deployment {
+  id          Int      @id @default(autoincrement())
+  projectId   Int
+  status      String   // PENDING, BUILDING, LIVE, FAILED
+  port        Int?
+  containerId String?
+  createdAt   DateTime @default(now())
+  project     Project  @relation(fields: [projectId], references: [id])
+}

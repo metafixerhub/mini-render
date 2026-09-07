@@ -22,6 +22,10 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/deploy', deployRoutes);
 app.use('/api/github', githubRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Control API listening on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Control API listening on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;

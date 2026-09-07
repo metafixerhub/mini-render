@@ -29,20 +29,34 @@ async function startDeployment({ repoUrl, branch }) {
   const envVars = await prisma.envVar.findMany({ where: { projectId: project.id } });
 
   // 3. Execute Docker Build and Run asynchronously
-  // In a real app, this would be a separate worker, but for V1 we do it here.
-  dockerService.buildAndRun(repoUrl, port, `dep_${deployment.id}`, envVars).then(async (containerId) => {
-    await prisma.deployment.update({
-      where: { id: deployment.id },
-      data: { status: 'LIVE', port, containerId }
+  // If WORKER_URL is set, we are on Vercel. Delegate to the VPS Worker.
+  const workerUrl = process.env.WORKER_URL;
+  if (workerUrl) {
+    console.log(`[Deployment Service] Delegating deployment ${deployment.id} to Worker at ${workerUrl}`);
+    fetch(`${workerUrl}/deploy`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ repoUrl, port, deploymentId: `dep_${deployment.id}`, envVars })
+    }).catch(err => {
+      console.error(`[Deployment Service] Failed to contact worker:`, err);
     });
-    console.log(`[Deployment Service] Deployment ${deployment.id} is LIVE on port ${port} with container ${containerId}`);
-  }).catch(async (err) => {
-    console.error(`[Deployment Service] Deployment ${deployment.id} FAILED:`, err);
-    await prisma.deployment.update({
-      where: { id: deployment.id },
-      data: { status: 'FAILED' }
+    // The Worker will be responsible for updating the DB state to LIVE or FAILED.
+  } else {
+    // Local fallback for MVP testing
+    dockerService.buildAndRun(repoUrl, port, `dep_${deployment.id}`, envVars).then(async (containerId) => {
+      await prisma.deployment.update({
+        where: { id: deployment.id },
+        data: { status: 'LIVE', port, containerId }
+      });
+      console.log(`[Deployment Service] Deployment ${deployment.id} is LIVE on port ${port} with container ${containerId}`);
+    }).catch(async (err) => {
+      console.error(`[Deployment Service] Deployment ${deployment.id} FAILED:`, err);
+      await prisma.deployment.update({
+        where: { id: deployment.id },
+        data: { status: 'FAILED' }
+      });
     });
-  });
+  }
   
   return deployment;
 }

@@ -1,3 +1,4 @@
+"use client"
 import { useState, useEffect } from 'react'
 import { Plus, ExternalLink, Activity, Github, Settings, RefreshCw, Key, Shield, Clock, Terminal } from 'lucide-react'
 import toast from 'react-hot-toast'

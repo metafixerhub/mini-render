@@ -38,7 +38,7 @@ export default function DashboardPage() {
             const isFailed = latestDep?.status === 'FAILED'
             
             return (
-              <div key={project.id} className="bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-gray-600 transition-colors cursor-pointer group">
+              <a href={`/project/${project.id}`} key={project.id} className="block bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-gray-600 transition-colors group cursor-pointer">
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-lg font-semibold group-hover:text-blue-400 transition-colors">{project.name}</h3>
                   {isLive && <span className="bg-green-500/10 text-green-400 text-xs px-2 py-1 rounded border border-green-500/20">LIVE</span>}
@@ -49,12 +49,12 @@ export default function DashboardPage() {
                 <div className="flex items-center text-sm text-gray-500 gap-4">
                   <span className="flex items-center gap-1">🟢 Node.js</span>
                   {isLive && latestDep.port && (
-                    <a href={`http://localhost:${latestDep.port}`} target="_blank" rel="noreferrer" className="hover:text-white transition-colors text-blue-400">
+                    <span className="hover:text-white transition-colors text-blue-400">
                       localhost:{latestDep.port}
-                    </a>
+                    </span>
                   )}
                 </div>
-              </div>
+              </a>
             )
           })}
         </div>

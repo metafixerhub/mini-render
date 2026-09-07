@@ -4,7 +4,7 @@ const fs = require('fs');
 const util = require('util');
 const execPromise = util.promisify(exec);
 
-async function buildAndRun(repoUrl, port, deploymentId) {
+async function buildAndRun(repoUrl, port, deploymentId, envVars = []) {
   const repoName = repoUrl.split('/').pop().replace('.git', '');
   const cloneDir = path.join(__dirname, '../../tmp', deploymentId);
   const imageName = `minirender-${repoName.toLowerCase()}-${deploymentId}`.replace(/[^a-z0-9_-]/g, '');
@@ -37,9 +37,12 @@ CMD ["npm", "start"]
   console.log(`[Docker Service] Building image ${imageName}`);
   await execPromise(`docker build -t ${imageName} .`, { cwd: cloneDir });
 
-  // 4. Docker Run (assuming the app exposes 8080 inside the container)
+  // 4. Build Env Vars string
+  const envString = envVars.map(e => `-e ${e.key}="${e.value}"`).join(' ');
+
+  // 5. Docker Run
   console.log(`[Docker Service] Running container on port ${port}`);
-  const { stdout: containerId } = await execPromise(`docker run -d -p ${port}:8080 ${imageName}`);
+  const { stdout: containerId } = await execPromise(`docker run -d ${envString} -p ${port}:8080 ${imageName}`);
   
   console.log(`[Docker Service] Container started: ${containerId.trim()}`);
   return containerId.trim();

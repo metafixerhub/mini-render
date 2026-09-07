@@ -4,7 +4,8 @@ require('dotenv').config();
 
 router.get('/github', (req, res) => {
   const clientId = process.env.GITHUB_CLIENT_ID;
-  const redirectUri = 'http://localhost:4000/api/auth/github/callback';
+  const backendUrl = process.env.BACKEND_URL || 'http://localhost:4000';
+  const redirectUri = `${backendUrl}/api/auth/github/callback`;
   
   if (clientId) {
     const githubUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=repo,user`;

@@ -1,15 +1,22 @@
 const express = require('express');
 const router = express.Router();
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
-router.get('/', (req, res) => {
-  // TODO: Fetch projects from SQLite
-  res.json({ projects: [] });
-});
-
-router.post('/', (req, res) => {
-  const { name, repoUrl } = req.body;
-  // TODO: Save project to SQLite
-  res.json({ message: 'Project created', project: { id: 1, name, repoUrl } });
+router.get('/', async (req, res) => {
+  try {
+    const projects = await prisma.project.findMany({
+      include: {
+        deployments: {
+          orderBy: { createdAt: 'desc' },
+          take: 1
+        }
+      }
+    });
+    res.json({ projects });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 module.exports = router;

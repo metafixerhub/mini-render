@@ -1,7 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react'
-
-import { Plus, Server, GitBranch, ExternalLink, Activity } from 'lucide-react'
+import { Plus, Server, GitBranch, ExternalLink, Activity, Clock, CheckCircle2, XCircle } from 'lucide-react'
 
 export default function DashboardPage() {
   const [projects, setProjects] = useState<any[]>([])
@@ -20,80 +19,103 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-10">
-        <div>
-          <h1 className="text-3xl font-extrabold text-white mb-2">Your Services</h1>
-          <p className="text-gray-400">Manage and monitor your deployments</p>
-        </div>
-        <a href="/new" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-[0_0_20px_-5px_rgba(37,99,235,0.4)]">
-          <Plus size={20} />
-          New Service
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <a href="/new" className="flex items-center gap-2 bg-[#6366f1] hover:bg-[#4f46e5] text-white px-4 py-2 rounded-md font-medium transition-colors text-sm shadow-sm">
+          <Plus size={16} />
+          New
         </a>
       </div>
       
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="bg-white/[0.02] border border-white/5 rounded-xl p-6 animate-pulse">
-              <div className="flex justify-between items-start mb-4">
-                <div className="h-6 bg-white/10 rounded w-32"></div>
-                <div className="h-5 bg-white/10 rounded w-16"></div>
-              </div>
-              <div className="h-4 bg-white/5 rounded w-48 mb-6"></div>
-              <div className="flex gap-4">
-                <div className="h-4 bg-white/5 rounded w-20"></div>
-                <div className="h-4 bg-white/5 rounded w-24"></div>
-              </div>
-            </div>
-          ))}
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
+          <div className="p-6 text-center text-gray-500 text-sm py-12 flex flex-col items-center justify-center">
+            <Activity className="animate-spin text-gray-300 mb-3" size={24} />
+            Loading services...
+          </div>
         </div>
       ) : projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-white/[0.02] border border-white/5 rounded-2xl border-dashed">
-          <div className="bg-white/5 p-4 rounded-full mb-4">
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-12 flex flex-col items-center justify-center text-center">
+          <div className="bg-gray-50 p-4 rounded-full mb-4 border border-gray-100">
             <Server size={32} className="text-gray-400" />
           </div>
-          <h3 className="text-xl font-bold text-white mb-2">No services deployed yet</h3>
-          <p className="text-gray-400 mb-6 text-center max-w-sm">Connect a GitHub repository and ship your first service to production in seconds.</p>
-          <a href="/new" className="flex items-center gap-2 bg-white text-black px-6 py-2.5 rounded-full font-bold hover:scale-105 transition-transform">
-            Deploy Now
+          <h3 className="text-lg font-bold text-gray-900 mb-2">No services deployed yet</h3>
+          <p className="text-gray-500 mb-6 max-w-sm text-sm">Connect a GitHub repository and deploy your first web service in minutes.</p>
+          <a href="/new" className="bg-[#6366f1] text-white px-6 py-2 rounded-md font-medium hover:bg-[#4f46e5] transition-colors text-sm shadow-sm">
+            Deploy your first service
           </a>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map(project => {
-            const latestDep = project.deployments?.[0]
-            const isLive = latestDep?.status === 'LIVE'
-            const isBuilding = latestDep?.status === 'BUILDING'
-            const isFailed = latestDep?.status === 'FAILED'
-            
-            return (
-              <a href={`/project/${project.id}`} key={project.id} className="block relative bg-[#0a0a0a] border border-white/10 rounded-xl p-6 hover:border-blue-500/50 transition-all group overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative z-10">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">{project.name}</h3>
-                    {isLive && <span className="flex items-center gap-1.5 bg-green-500/10 text-green-400 text-xs px-2.5 py-1 rounded-full border border-green-500/20 font-medium tracking-wide"><div className="w-1.5 h-1.5 rounded-full bg-green-400" />LIVE</span>}
-                    {isBuilding && <span className="flex items-center gap-1.5 bg-yellow-500/10 text-yellow-400 text-xs px-2.5 py-1 rounded-full border border-yellow-500/20 font-medium tracking-wide animate-pulse"><Activity size={12} />BUILDING</span>}
-                    {isFailed && <span className="flex items-center gap-1.5 bg-red-500/10 text-red-400 text-xs px-2.5 py-1 rounded-full border border-red-500/20 font-medium tracking-wide">FAILED</span>}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-400 mb-6 font-mono bg-white/5 px-3 py-1.5 rounded-md w-fit">
-                    <GitBranch size={14} />
-                    {project.repoUrl.replace('https://github.com/', '')}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-500 gap-4">
-                    <span className="flex items-center gap-1.5 text-gray-300">
-                      <Server size={14} /> Node.js
-                    </span>
-                    {isLive && latestDep.port && (
-                      <span className="flex items-center gap-1 text-blue-400 hover:text-blue-300 transition-colors">
-                        <ExternalLink size={14} /> localhost:{latestDep.port}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </a>
-            )
-          })}
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-gray-50 text-gray-500 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-3 font-medium">Name</th>
+                <th className="px-6 py-3 font-medium">Type</th>
+                <th className="px-6 py-3 font-medium">Branch</th>
+                <th className="px-6 py-3 font-medium">Status</th>
+                <th className="px-6 py-3 font-medium text-right">Last Deployed</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {projects.map(project => {
+                const latestDep = project.deployments?.[0]
+                const isLive = latestDep?.status === 'LIVE'
+                const isBuilding = latestDep?.status === 'BUILDING'
+                const isFailed = latestDep?.status === 'FAILED'
+                
+                return (
+                  <tr key={project.id} className="hover:bg-gray-50/50 transition-colors group cursor-pointer" onClick={() => window.location.href = `/project/${project.id}`}>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-md bg-gray-100 border border-gray-200 flex items-center justify-center">
+                          <Server size={16} className="text-gray-500" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{project.name}</div>
+                          {isLive && latestDep.port && (
+                            <a href={`http://localhost:${latestDep.port}`} target="_blank" rel="noreferrer" className="text-xs text-gray-500 hover:text-blue-600 flex items-center gap-1 mt-0.5" onClick={e => e.stopPropagation()}>
+                              <ExternalLink size={10} /> localhost:{latestDep.port}
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-gray-600">Web Service</td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-1.5 text-gray-600 font-mono text-xs bg-gray-100 px-2 py-1 rounded w-fit border border-gray-200">
+                        <GitBranch size={12} />
+                        main
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {isLive && (
+                        <div className="flex items-center gap-1.5 text-green-700 text-xs font-medium">
+                          <CheckCircle2 size={14} className="text-green-500" /> Deploy succeeded
+                        </div>
+                      )}
+                      {isBuilding && (
+                        <div className="flex items-center gap-1.5 text-yellow-700 text-xs font-medium">
+                          <Activity size={14} className="text-yellow-500 animate-pulse" /> Deploying...
+                        </div>
+                      )}
+                      {isFailed && (
+                        <div className="flex items-center gap-1.5 text-red-700 text-xs font-medium">
+                          <XCircle size={14} className="text-red-500" /> Deploy failed
+                        </div>
+                      )}
+                      {!latestDep && (
+                        <span className="text-gray-400 text-xs">No deployments</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right text-gray-500 text-xs">
+                      {latestDep ? new Date(latestDep.createdAt).toLocaleDateString() : '-'}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

@@ -1,15 +1,13 @@
 "use client"
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { GitBranch, Code, Settings, Loader2, ArrowRight } from 'lucide-react'
+import { GitBranch, Rocket, Server, Github, CheckCircle2, Search, ArrowRight } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-export default function NewDeploymentPage() {
-  const router = useRouter()
+export default function NewProjectPage() {
   const [repos, setRepos] = useState<any[]>([])
-  const [selectedRepo, setSelectedRepo] = useState('')
-  const [deploying, setDeploying] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [deploying, setDeploying] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-mini-render.vercel.app'
@@ -20,12 +18,12 @@ export default function NewDeploymentPage() {
         setLoading(false)
       })
       .catch(() => {
-        toast.error('Failed to load repositories')
+        toast.error('Failed to load GitHub repositories')
         setLoading(false)
       })
   }, [])
 
-  const handleDeploy = async () => {
+  const handleDeploy = async (repoUrl: string) => {
     setDeploying(true)
     const toastId = toast.loading('Initializing deployment engine...')
     try {
@@ -33,109 +31,100 @@ export default function NewDeploymentPage() {
       const res = await fetch(`${apiUrl}/api/deploy`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ repoUrl: selectedRepo, branch: 'main' })
+        body: JSON.stringify({ repoUrl, branch: 'main' })
       })
       
-      if (!res.ok) throw new Error('Deployment failed')
+      if (!res.ok) throw new Error('Deploy failed')
       
-      toast.success('Deployment triggered successfully!', { id: toastId })
-      router.push('/dashboard')
+      const data = await res.json()
+      toast.success('Deployment started successfully!', { id: toastId })
+      
+      setTimeout(() => {
+        window.location.href = `/project/${data.project.id}`
+      }, 1000)
     } catch (e) {
-      toast.error('Failed to trigger deployment', { id: toastId })
+      toast.error('Failed to start deployment', { id: toastId })
       setDeploying(false)
     }
   }
 
+  const filteredRepos = repos.filter(repo => 
+    repo.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="mb-10 text-center">
-        <h1 className="text-4xl font-extrabold text-white mb-3">Deploy a new project</h1>
-        <p className="text-gray-400">Select a GitHub repository to import and deploy.</p>
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Create a New Web Service</h1>
+        <p className="text-gray-500">Connect a repository from GitHub. We'll automatically build and deploy it.</p>
       </div>
-      
-      <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
-        <div className="p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="h-8 w-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">1</div>
-            <h2 className="text-xl font-semibold text-white">Import Git Repository</h2>
-          </div>
-          
-          <div className="mb-8">
-            {loading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="h-20 bg-white/5 rounded-xl animate-pulse" />
-                ))}
-              </div>
-            ) : repos.length === 0 ? (
-              <div className="text-center py-10 bg-white/5 rounded-xl border border-dashed border-white/10">
-                <GitBranch size={32} className="mx-auto text-gray-500 mb-3" />
-                <p className="text-gray-400">No repositories found.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {repos.map(repo => (
-                  <div 
-                    key={repo.id}
-                    onClick={() => setSelectedRepo(repo.url)}
-                    className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${selectedRepo === repo.url ? 'border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/20 ring-offset-2 ring-offset-[#0a0a0a]' : 'border-white/10 bg-black hover:border-white/20 hover:bg-white/5'}`}
-                  >
-                    <GitBranch size={20} className={selectedRepo === repo.url ? 'text-blue-400' : 'text-gray-400'} />
-                    <div className="overflow-hidden">
-                      <span className="font-semibold text-white block truncate">{repo.name}</span>
-                      <div className="text-xs text-gray-500 mt-1 truncate">{repo.url.replace('https://github.com/', '')}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          
-          <div className="border-t border-white/10 pt-8 mt-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="h-8 w-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">2</div>
-              <h2 className="text-xl font-semibold text-white">Configure Build</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
-                  <Code size={16} /> Framework Preset
-                </label>
-                <select disabled className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none opacity-50 cursor-not-allowed">
-                  <option>Docker / Node.js (Auto-detect)</option>
-                </select>
-              </div>
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
-                  <Settings size={16} /> Root Directory
-                </label>
-                <input disabled type="text" placeholder="./" className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 opacity-50 cursor-not-allowed" />
-              </div>
-            </div>
+
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden mb-8">
+        <div className="p-6 border-b border-gray-200 bg-gray-50">
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
+            <Github size={20} /> Connect a repository
+          </h2>
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <input 
+              type="text" 
+              placeholder="Search repositories..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-sm text-gray-900 shadow-sm"
+            />
           </div>
         </div>
 
-        <div className="bg-white/[0.02] border-t border-white/10 p-6 flex justify-between items-center">
-          <p className="text-sm text-gray-500">You can configure environment variables after deployment.</p>
-          <button 
-            onClick={handleDeploy}
-            disabled={!selectedRepo || deploying}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-900 disabled:text-blue-300 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-full transition-all shadow-[0_0_20px_-5px_rgba(37,99,235,0.4)]"
-          >
-            {deploying ? (
-              <>
-                <Loader2 size={20} className="animate-spin" />
-                Deploying...
-              </>
-            ) : (
-              <>
-                Deploy
-                <ArrowRight size={20} />
-              </>
-            )}
-          </button>
+        <div className="divide-y divide-gray-100 max-h-[500px] overflow-y-auto">
+          {loading ? (
+            <div className="p-12 text-center text-gray-500 flex flex-col items-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+              Loading repositories from GitHub...
+            </div>
+          ) : filteredRepos.length === 0 ? (
+            <div className="p-12 text-center text-gray-500">
+              No repositories found. Ensure you have granted access to your GitHub account.
+            </div>
+          ) : (
+            filteredRepos.map(repo => (
+              <div key={repo.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors group">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-md bg-gray-100 border border-gray-200 flex items-center justify-center">
+                    <GitBranch size={20} className="text-gray-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{repo.full_name}</h3>
+                    <p className="text-xs text-gray-500 flex items-center gap-2 mt-1">
+                      {repo.private ? (
+                        <span className="bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded text-[10px] font-medium">Private</span>
+                      ) : (
+                        <span className="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[10px] font-medium">Public</span>
+                      )}
+                      Updated {new Date(repo.updated_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => handleDeploy(repo.html_url)}
+                  disabled={deploying}
+                  className="bg-white border border-gray-300 text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 px-4 py-2 rounded-md font-medium text-sm transition-colors flex items-center gap-2 disabled:opacity-50 shadow-sm"
+                >
+                  Connect <ArrowRight size={14} />
+                </button>
+              </div>
+            ))
+          )}
         </div>
+      </div>
+      
+      <div className="bg-blue-50 border border-blue-100 rounded-lg p-6">
+        <h3 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
+          <CheckCircle2 size={18} className="text-blue-600" /> What happens next?
+        </h3>
+        <p className="text-sm text-blue-800">
+          When you connect a repository, Mini Render will automatically detect the language (Node.js/React), build a Docker container, and deploy it to a secure cloud server. We will automatically generate a domain for you and set up SSL.
+        </p>
       </div>
     </div>
   )

@@ -1,11 +1,12 @@
 "use client"
 import { useState, useEffect } from 'react'
-import { Plus, ExternalLink, Activity, GitBranch, Settings, RefreshCw, Key, Shield, Clock, Terminal } from 'lucide-react'
+import { ExternalLink, GitBranch, Settings, RefreshCw, Activity, Terminal, Shield, CheckCircle2, XCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function ProjectPage({ params }: { params: { id: string } }) {
   const [project, setProject] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState('events')
   const [envKey, setEnvKey] = useState('')
   const [envValue, setEnvValue] = useState('')
   const [deploying, setDeploying] = useState(false)
@@ -50,7 +51,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
 
   const handleRedeploy = async () => {
     setDeploying(true)
-    const toastId = toast.loading('Triggering manual redeploy...')
+    const toastId = toast.loading('Triggering manual deploy...')
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-mini-render.vercel.app'
       const res = await fetch(`${apiUrl}/api/deploy`, {
@@ -60,9 +61,10 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
       })
       if (!res.ok) throw new Error('Deploy failed')
       
-      toast.success('Redeploy triggered successfully', { id: toastId })
+      toast.success('Deploy started', { id: toastId })
+      setActiveTab('events')
     } catch (e) {
-      toast.error('Failed to trigger redeploy', { id: toastId })
+      toast.error('Failed to start deploy', { id: toastId })
     } finally {
       setDeploying(false)
       fetchProject()
@@ -70,53 +72,51 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
   }
 
   if (loading) return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-pulse">
-      <div className="h-16 bg-white/5 rounded-2xl w-1/3"></div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 h-96 bg-white/5 rounded-2xl"></div>
-        <div className="h-96 bg-white/5 rounded-2xl"></div>
-      </div>
+    <div className="flex justify-center py-20">
+      <Activity className="animate-spin text-gray-400" size={32} />
     </div>
   )
   
   if (!project) return (
-    <div className="flex flex-col items-center justify-center py-20 text-center">
-      <div className="bg-red-500/10 p-4 rounded-full mb-4">
-        <Activity size={32} className="text-red-400" />
-      </div>
-      <h3 className="text-xl font-bold text-white mb-2">Project Not Found</h3>
-      <p className="text-gray-400 mb-6">This project may have been deleted or does not exist.</p>
-      <a href="/dashboard" className="bg-white text-black px-6 py-2.5 rounded-full font-bold">Back to Dashboard</a>
+    <div className="flex flex-col items-center py-20">
+      <h3 className="text-xl font-bold text-gray-900 mb-2">Service Not Found</h3>
+      <a href="/dashboard" className="text-blue-600 hover:underline">Back to Dashboard</a>
     </div>
   )
 
   const latestDep = project.deployments?.[0]
   const isLive = latestDep?.status === 'LIVE'
 
+  const tabs = [
+    { id: 'events', label: 'Events' },
+    { id: 'env', label: 'Environment' },
+    { id: 'settings', label: 'Settings' }
+  ]
+
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+    <div className="max-w-5xl">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-4xl font-extrabold text-white">{project.name}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
             {isLive ? (
-              <span className="flex items-center gap-1.5 bg-green-500/10 text-green-400 text-xs px-2.5 py-1 rounded-full border border-green-500/20 font-medium tracking-wide">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-400" />LIVE
+              <span className="flex items-center gap-1 bg-green-50 text-green-700 text-xs px-2 py-0.5 rounded border border-green-200 font-medium">
+                <CheckCircle2 size={12} /> Live
               </span>
             ) : (
-              <span className="flex items-center gap-1.5 bg-yellow-500/10 text-yellow-400 text-xs px-2.5 py-1 rounded-full border border-yellow-500/20 font-medium tracking-wide">
-                BUILDING
+              <span className="flex items-center gap-1 bg-yellow-50 text-yellow-700 text-xs px-2 py-0.5 rounded border border-yellow-200 font-medium">
+                <Activity size={12} className="animate-pulse" /> Deploying
               </span>
             )}
           </div>
-          <div className="flex items-center gap-4 text-sm text-gray-400">
-            <a href={project.repoUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors">
-              <GitBranch size={16} />
+          <div className="flex items-center gap-4 text-sm text-gray-500">
+            <a href={project.repoUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-blue-600 transition-colors">
+              <GitBranch size={14} />
               {project.repoUrl.replace('https://github.com/', '')}
             </a>
             {isLive && latestDep?.port && (
-              <a href={`http://localhost:${latestDep.port}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition-colors">
-                <ExternalLink size={16} />
+              <a href={`http://localhost:${latestDep.port}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-blue-600 hover:underline">
+                <ExternalLink size={14} />
                 localhost:{latestDep.port}
               </a>
             )}
@@ -125,110 +125,153 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
         <button 
           onClick={handleRedeploy}
           disabled={deploying}
-          className="flex items-center gap-2 bg-white/5 border border-white/10 hover:bg-white/10 disabled:opacity-50 text-white px-5 py-2.5 rounded-lg font-medium transition-all"
+          className="flex items-center gap-2 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-50 text-gray-700 px-4 py-2 rounded-md font-medium transition-all text-sm shadow-sm"
         >
-          <RefreshCw size={16} className={deploying ? 'animate-spin' : ''} />
-          {deploying ? 'Deploying...' : 'Redeploy'}
+          <RefreshCw size={14} className={deploying ? 'animate-spin' : ''} />
+          Manual Deploy
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <Shield className="text-blue-400" size={24} />
-              <h2 className="text-xl font-bold text-white">Environment Variables</h2>
-            </div>
-            
-            <p className="text-sm text-gray-400 mb-6">
-              Securely store secrets and configuration. These are injected into your Docker container at runtime.
+      <div className="border-b border-gray-200 mb-6">
+        <nav className="flex gap-6">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === tab.id
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-lg shadow-sm min-h-[400px]">
+        {activeTab === 'events' && (
+          <div className="p-0">
+            {project.deployments?.length === 0 ? (
+              <div className="p-12 text-center text-gray-500 text-sm">No events yet. Deploy your project to see activity.</div>
+            ) : (
+              <ul className="divide-y divide-gray-100">
+                {project.deployments?.map((dep: any) => (
+                  <li key={dep.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
+                    <div className="flex items-center gap-4">
+                      {dep.status === 'LIVE' ? (
+                        <CheckCircle2 className="text-green-500" size={20} />
+                      ) : dep.status === 'FAILED' ? (
+                        <XCircle className="text-red-500" size={20} />
+                      ) : (
+                        <Activity className="text-yellow-500 animate-spin" size={20} />
+                      )}
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          Deploy {dep.status === 'LIVE' ? 'succeeded' : dep.status === 'FAILED' ? 'failed' : 'started'}
+                        </div>
+                        <div className="text-xs text-gray-500 font-mono mt-1">ID: {dep.id}</div>
+                      </div>
+                    </div>
+                    <div className="text-xs text-gray-500">{new Date(dep.createdAt).toLocaleString()}</div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'env' && (
+          <div className="p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Environment Variables</h2>
+            <p className="text-sm text-gray-500 mb-6">
+              Environment variables are injected into your service at runtime.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 mb-8">
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex gap-3 mb-8">
               <input 
                 type="text" 
-                placeholder="KEY (e.g. DATABASE_URL)" 
+                placeholder="Key (e.g. DATABASE_URL)" 
                 value={envKey}
                 onChange={e => setEnvKey(e.target.value.toUpperCase().replace(/\s+/g, '_'))}
-                className="bg-black border border-white/10 rounded-lg px-4 py-2.5 w-full sm:w-1/3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-white font-mono text-sm"
+                className="bg-white border border-gray-300 rounded-md px-3 py-2 w-1/3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-gray-900 font-mono text-sm shadow-sm"
               />
               <input 
                 type="text" 
-                placeholder="VALUE" 
+                placeholder="Value" 
                 value={envValue}
                 onChange={e => setEnvValue(e.target.value)}
-                className="bg-black border border-white/10 rounded-lg px-4 py-2.5 flex-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-white font-mono text-sm"
+                className="bg-white border border-gray-300 rounded-md px-3 py-2 flex-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-gray-900 font-mono text-sm shadow-sm"
               />
               <button 
                 onClick={handleAddEnv}
                 disabled={!envKey || !envValue}
-                className="flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-900 disabled:text-blue-300 disabled:cursor-not-allowed px-6 py-2.5 rounded-lg font-medium text-white transition-all sm:w-auto w-full"
+                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 px-4 py-2 rounded-md font-medium text-white transition-colors text-sm shadow-sm"
               >
-                <Plus size={18} />
                 Save
               </button>
             </div>
 
-            <div className="space-y-3">
-              {project.envVars?.map((env: any) => (
-                <div key={env.id} className="flex items-center justify-between bg-white/[0.02] border border-white/5 rounded-lg p-4 group hover:bg-white/[0.04] transition-colors">
-                  <div className="flex items-center gap-3 w-1/3">
-                    <Key size={14} className="text-gray-500 group-hover:text-blue-400 transition-colors" />
-                    <span className="font-mono text-sm text-gray-300 truncate">{env.key}</span>
-                  </div>
-                  <span className="flex-1 font-mono text-sm text-gray-600 tracking-widest pl-4 border-l border-white/5">
-                    ••••••••••••••••
-                  </span>
-                </div>
-              ))}
-              {project.envVars?.length === 0 && (
-                <div className="text-center py-8 border border-dashed border-white/10 rounded-lg text-gray-500 text-sm">
-                  No environment variables configured.
-                </div>
-              )}
-            </div>
+            <table className="w-full text-sm text-left border border-gray-200 rounded-lg overflow-hidden">
+              <thead className="bg-gray-50 text-gray-500 border-b border-gray-200">
+                <tr>
+                  <th className="px-4 py-2 font-medium w-1/3">Key</th>
+                  <th className="px-4 py-2 font-medium">Value</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {project.envVars?.map((env: any) => (
+                  <tr key={env.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-mono text-gray-900">{env.key}</td>
+                    <td className="px-4 py-3 font-mono text-gray-400">••••••••••••••••</td>
+                  </tr>
+                ))}
+                {project.envVars?.length === 0 && (
+                  <tr>
+                    <td colSpan={2} className="px-4 py-8 text-center text-gray-500">No environment variables set.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        </div>
+        )}
 
-        <div className="space-y-8">
-          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-6 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-32 bg-blue-500/5 rounded-full blur-[80px] pointer-events-none" />
-            <div className="flex items-center gap-3 mb-6 relative">
-              <Clock className="text-purple-400" size={24} />
-              <h2 className="text-xl font-bold text-white">Deployments</h2>
-            </div>
+        {activeTab === 'settings' && (
+          <div className="p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-6">General</h2>
             
-            <div className="space-y-4 relative">
-              {project.deployments?.map((dep: any, index: number) => (
-                <div key={dep.id} className="relative pl-6 pb-4 border-l border-white/10 last:border-0 last:pb-0">
-                  <div className={`absolute -left-1.5 top-1.5 w-3 h-3 rounded-full border-2 border-[#0a0a0a] ${dep.status === 'LIVE' ? 'bg-green-500' : dep.status === 'BUILDING' ? 'bg-yellow-500 animate-pulse' : 'bg-red-500'}`} />
-                  
-                  <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-mono text-xs text-gray-500">#{dep.id.substring(0, 8)}</span>
-                      {dep.status === 'LIVE' && <span className="text-green-400 text-[10px] font-bold tracking-wider px-2 py-0.5 bg-green-400/10 rounded">LIVE</span>}
-                      {dep.status === 'BUILDING' && <span className="text-yellow-400 text-[10px] font-bold tracking-wider px-2 py-0.5 bg-yellow-400/10 rounded animate-pulse">BUILDING</span>}
-                      {dep.status === 'FAILED' && <span className="text-red-400 text-[10px] font-bold tracking-wider px-2 py-0.5 bg-red-400/10 rounded">FAILED</span>}
-                    </div>
-                    
-                    <div className="flex items-center gap-2 text-sm text-gray-300">
-                      <Terminal size={14} className="text-gray-500" />
-                      Production Build
-                    </div>
-                    
-                    <div className="text-xs text-gray-500 mt-3 pt-3 border-t border-white/5">
-                      {new Date(dep.createdAt).toLocaleString()}
-                    </div>
-                  </div>
+            <div className="border border-gray-200 rounded-lg divide-y divide-gray-200">
+              <div className="p-4 flex justify-between items-center">
+                <div>
+                  <h3 className="font-medium text-gray-900">Project Name</h3>
+                  <p className="text-sm text-gray-500">The name of your service on Mini Render.</p>
                 </div>
-              ))}
-              
-              {project.deployments?.length === 0 && (
-                <div className="text-gray-500 text-sm text-center py-4">No deployments yet.</div>
-              )}
+                <div className="font-mono bg-gray-100 px-3 py-1.5 rounded text-sm text-gray-700 border border-gray-200">{project.name}</div>
+              </div>
+              <div className="p-4 flex justify-between items-center">
+                <div>
+                  <h3 className="font-medium text-gray-900">Repository</h3>
+                  <p className="text-sm text-gray-500">The connected GitHub repository.</p>
+                </div>
+                <a href={project.repoUrl} target="_blank" className="text-blue-600 hover:underline text-sm flex items-center gap-1">
+                  {project.repoUrl.replace('https://github.com/', '')} <ExternalLink size={12} />
+                </a>
+              </div>
+            </div>
+
+            <h2 className="text-lg font-bold text-red-600 mb-4 mt-12">Danger Zone</h2>
+            <div className="border border-red-200 rounded-lg p-4 flex justify-between items-center bg-red-50">
+              <div>
+                <h3 className="font-medium text-red-900">Delete Service</h3>
+                <p className="text-sm text-red-700">Once you delete a service, there is no going back.</p>
+              </div>
+              <button className="bg-white border border-red-300 text-red-600 hover:bg-red-50 px-4 py-2 rounded-md font-medium text-sm transition-colors shadow-sm">
+                Delete
+              </button>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )

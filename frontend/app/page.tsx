@@ -8,7 +8,7 @@ export default function LandingPage() {
         The easiest way to host your Node.js, React, Next.js, and static sites. Zero configuration required. Just connect your GitHub repository and we handle the rest.
       </p>
       <div className="flex gap-4">
-        <a href="http://localhost:4000/api/auth/github" className="bg-white text-black px-8 py-3 rounded-full font-bold text-lg hover:scale-105 transition-transform">
+        <a href={process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/api/auth/github` : "http://localhost:4000/api/auth/github"} className="bg-white text-black px-8 py-3 rounded-full font-bold text-lg hover:scale-105 transition-transform">
           Start Deploying for Free
         </a>
         <a href="#features" className="bg-gray-800 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-700 transition-colors">

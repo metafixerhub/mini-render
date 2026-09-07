@@ -9,7 +9,8 @@ export default function NewDeploymentPage() {
 
   useEffect(() => {
     // Fetch mock repositories from backend
-    fetch('http://localhost:4000/api/github/repos')
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+    fetch(`${apiUrl}/api/github/repos`)
       .then(res => res.json())
       .then(data => {
         setRepos(data.repos || [])
@@ -21,7 +22,8 @@ export default function NewDeploymentPage() {
   const handleDeploy = async () => {
     setDeploying(true)
     try {
-      const res = await fetch('http://localhost:4000/api/deploy', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+      const res = await fetch(`${apiUrl}/api/deploy`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ repoUrl: selectedRepo, branch: 'main' })

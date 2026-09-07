@@ -22,7 +22,7 @@ export default function RootLayout({
               </div>
               <div className="flex items-center gap-4">
                 <a href="/dashboard" className="text-gray-300 hover:text-white transition-colors">Dashboard</a>
-                <a href="http://localhost:4000/api/auth/github" className="bg-white text-black px-4 py-2 rounded-md font-medium hover:bg-gray-200 transition-colors">
+                <a href={process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/api/auth/github` : "http://localhost:4000/api/auth/github"} className="bg-white text-black px-4 py-2 rounded-md font-medium hover:bg-gray-200 transition-colors">
                   Login with GitHub
                 </a>
               </div>

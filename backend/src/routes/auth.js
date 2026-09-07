@@ -19,7 +19,7 @@ router.get('/github', (req, res) => {
 
 router.get('/github/callback', async (req, res) => {
   const { code } = req.query;
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const frontendUrl = process.env.FRONTEND_URL || 'https://mini-render.vercel.app';
   
   if (code === 'mock_code' || !process.env.GITHUB_CLIENT_ID) {
     // Mock successful login

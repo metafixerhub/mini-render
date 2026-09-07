@@ -12,7 +12,7 @@ export default function NewDeploymentPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-mini-render.vercel.app'
     fetch(`${apiUrl}/api/github/repos`)
       .then(res => res.json())
       .then(data => {
@@ -29,7 +29,7 @@ export default function NewDeploymentPage() {
     setDeploying(true)
     const toastId = toast.loading('Initializing deployment engine...')
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-mini-render.vercel.app'
       const res = await fetch(`${apiUrl}/api/deploy`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

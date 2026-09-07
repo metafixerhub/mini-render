@@ -29,7 +29,7 @@ export default function RootLayout({
               </a>
               <div className="flex items-center gap-6">
                 <a href="/dashboard" className="text-sm text-gray-300 hover:text-white transition-colors">Dashboard</a>
-                <a href={process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/api/auth/github` : "http://localhost:4000/api/auth/github"} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full font-medium transition-all text-sm border border-white/10">
+                <a href={process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/api/auth/github` : "https://backend-mini-render.vercel.app/api/auth/github"} className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full font-medium transition-all text-sm border border-white/10">
                   <GitBranch size={16} />
                   Login
                 </a>

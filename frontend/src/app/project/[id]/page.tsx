@@ -11,7 +11,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
   const [deploying, setDeploying] = useState(false)
 
   const fetchProject = () => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-mini-render.vercel.app'
     fetch(`${apiUrl}/api/projects/${params.id}`)
       .then(res => res.json())
       .then(data => {
@@ -31,7 +31,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
   const handleAddEnv = async () => {
     const toastId = toast.loading('Saving environment variable...')
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-mini-render.vercel.app'
       const res = await fetch(`${apiUrl}/api/projects/${params.id}/env`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -52,7 +52,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
     setDeploying(true)
     const toastId = toast.loading('Triggering manual redeploy...')
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-mini-render.vercel.app'
       const res = await fetch(`${apiUrl}/api/deploy`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

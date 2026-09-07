@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react'
-import { ExternalLink, GitBranch, Settings, Activity, CheckCircle2, XCircle, Github, Link, RefreshCw } from 'lucide-react'
+import { ExternalLink, GitBranch, Settings, Activity, CheckCircle2, XCircle, Code, Link, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function ProjectPage({ params }: { params: { id: string } }) {
@@ -85,7 +85,7 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
             Domains
           </button>
           <a href={project.repoUrl} target="_blank" className="flex items-center gap-2 bg-white/10 text-white border border-white/10 px-4 py-1.5 rounded-md text-sm font-medium hover:bg-white/20 transition-colors">
-            <Github size={16} /> Repository
+            <Code size={16} /> Repository
           </a>
         </div>
       </div>

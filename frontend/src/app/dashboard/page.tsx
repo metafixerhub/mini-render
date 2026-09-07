@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react'
-import { Search, Plus, GitBranch, Github, ExternalLink, Activity, CheckCircle2, ChevronDown, LayoutGrid, List } from 'lucide-react'
+import { Search, Plus, GitBranch, Code, ExternalLink, Activity, CheckCircle2, ChevronDown, LayoutGrid, List } from 'lucide-react'
 
 export default function DashboardPage() {
   const [projects, setProjects] = useState<any[]>([])
@@ -47,7 +47,7 @@ export default function DashboardPage() {
         </div>
       ) : projects.length === 0 ? (
         <div className="border border-dashed border-white/10 rounded-xl p-12 flex flex-col items-center justify-center text-center">
-          <Github size={48} className="text-gray-600 mb-4" />
+          <Code size={48} className="text-gray-600 mb-4" />
           <h3 className="text-lg font-medium text-white mb-2">No projects yet</h3>
           <p className="text-gray-400 mb-6 text-sm">Deploy your first project from GitHub to get started.</p>
           <a href="/new" className="bg-white text-black px-6 py-2 rounded-md font-medium text-sm hover:bg-gray-200 transition-colors">

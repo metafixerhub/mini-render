@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react'
-import { GitBranch, Github, Search, Settings, ChevronDown, CheckCircle2, ChevronLeft } from 'lucide-react'
+import { GitBranch, Code, Search, Settings, ChevronDown, CheckCircle2, ChevronLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function NewProjectPage() {
@@ -146,7 +146,7 @@ export default function NewProjectPage() {
       <div className="bg-black border border-white/10 rounded-xl overflow-hidden mb-8">
         <div className="p-4 border-b border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-2 text-white font-medium">
-            <Github size={20} /> Import Git Repository
+            <Code size={20} /> Import Git Repository
           </div>
           <div className="relative w-full md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
@@ -175,7 +175,7 @@ export default function NewProjectPage() {
               <div key={repo.id} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded bg-white/10 border border-white/5 flex items-center justify-center">
-                    <Github size={16} className="text-gray-300" />
+                    <Code size={16} className="text-gray-300" />
                   </div>
                   <div>
                     <h3 className="font-medium text-white text-sm">{repo.full_name}</h3>
